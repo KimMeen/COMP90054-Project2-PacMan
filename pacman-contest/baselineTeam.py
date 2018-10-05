@@ -1,3 +1,7 @@
+#!/usr/bin/python
+# -*- coding:utf8 -*-
+
+
 # baselineTeam.py
 # ---------------
 # Licensing Information:  You are free to use or extend these projects for
@@ -78,6 +82,7 @@ class ReflexCaptureAgent(CaptureAgent):
 
     foodLeft = len(self.getFood(gameState).asList())
 
+    #返回自己领地
     if foodLeft <= 2:
       bestDist = 9999
       for action in actions:

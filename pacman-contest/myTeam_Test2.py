@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding:utf8 -*-
+
 from captureAgents import CaptureAgent
 import random, time, util
 from game import Directions
@@ -50,7 +53,7 @@ class ReflexCaptureAgent(CaptureAgent):
   def registerInitialState(self, gameState):
     self.start = gameState.getAgentPosition(self.index)
     CaptureAgent.registerInitialState(self, gameState) 
-    self.numFood = foodLeft = len(self.getFood(gameState).asList())
+    self.numFood = len(self.getFood(gameState).asList())
     self.initialFoodNum = len(self.getFood(gameState).asList())
 
   def chooseAction(self, gameState):
@@ -62,6 +65,7 @@ class ReflexCaptureAgent(CaptureAgent):
     actions = gameState.getLegalActions(self.index)
     # You can profile your evaluation time by uncommenting these lines
     # start = time.time()
+    # 这个value就是Q-value, 结合evaluate方法和下面的东西看
     values = [self.evaluate(gameState, a) for a in actions]
     # print 'eval time for agent %d: %.4f' % (self.index, time.time() - start)
     maxValue = max(values)
@@ -86,7 +90,7 @@ class ReflexCaptureAgent(CaptureAgent):
         self.numFood = foodLeft
     elif myTeam[0].isPacman and not myTeam[1].isPacman and self.index == 0:
         self.foodEaten = self.numFood - foodLeft
-        if (self.foodEaten == round(self.initialFoodNum / 5)):
+        if (self.foodEaten == round(self.initialFoodNum / 5)): #这个5可以调节
             bestDist = 9999
             for action in actions:
                 successor = self.getSuccessor(gameState, action)
@@ -139,11 +143,13 @@ class ReflexCaptureAgent(CaptureAgent):
     a counter or a dictionary.
     """
     return {'successorScore': 1.0}
+
   def getEuclideanDistance(self, position1, position2):
       "The Euclidean distance heuristic for a PositionSearchProblem"
       xy1 = position1
       xy2 = position2
       return ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 ) ** 0.5
+
 
 class OffensiveReflexAgent(ReflexCaptureAgent):
   """
@@ -154,28 +160,30 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
   def getFeatures(self, gameState, action):
     features = util.Counter()
     successor = self.getSuccessor(gameState, action)
-    # print successor
     foodList = self.getFood(successor).asList()    
     features['successorScore'] = -len(foodList)#self.getScore(successor)
+    
+    # My position
     myPos = successor.getAgentState(self.index).getPosition()
     # Compute distance to the nearest food
     if len(foodList) > 0: # This should always be True,  but better safe than sorry
       minDistance = min([self.getMazeDistance(myPos, food) for food in foodList])
       features['distanceToFood'] = minDistance
-    #print "data", gameState.data
     
-    # try to avoid the ghost from opponent ghost
+    # Try to avoid the ghost from opponent ghost
+    # enemies是对方全部单位，包括pacman和ghost
     enemies = [successor.getAgentState(i) for i in self.getOpponents(successor)]
-    #print "enemies", enemies[0].scaredTimer
-    #print "enemies", enemies[1]
+    # ghost和对方的pacman(就是invaders)通过这个方法提取出来
     ghosts = [a for a in enemies if not a.isPacman and a.getPosition() != None]
     invaders = [a for a in enemies if a.isPacman and a.getPosition() != None]
     
+    # 获取对方各种单位的position
     if len(invaders) != 0:
         invaderPos = [a.getPosition() for a in invaders]
     ghostPos = [g.getPosition() for g in ghosts]
 
-    # if enemy's pacman is close(within 1 distance) to my ghost(pacman)
+    # 如果对方的pacman靠近了我方ghost(within 1 distance)，那么就尝试搞死它
+    #下面的逻辑好像是当我方offender是幽灵，对方有pacman的情况
     if not successor.getAgentState(self.index).isPacman and len(invaders) != 0:
         myPos = successor.getAgentState(self.index).getPosition()
         disToPac = min([self.getMazeDistance(myPos, pac) for pac in invaderPos])
@@ -184,36 +192,43 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             features['distanceToInv'] = disToPac
 
     # handle both ghosts are at the boarder and inifinte looping with each other
-    
+    # 我觉得他下面的逻辑好像是处理当我方offender是幽灵，对方也有幽灵的时候的情况
     if not successor.getAgentState(self.index).isPacman and len(ghosts) != 0:
         myPos = successor.getAgentState(self.index).getPosition()
         disToPac = min([self.getMazeDistance(myPos, g) for g in ghostPos])
         features['ghostDistance'] = disToPac
+        
+    # 他写的这个elseif表示我方offender是pacman，对方有幽灵的情况
     elif len(ghosts) > 0:
-        dists = [self.getEuclideanDistance(myPos, ghost.getPosition()) for ghost in ghosts]
+        dists = [self.getMazeDistance(myPos, ghost.getPosition()) for ghost in ghosts]
         features['ghostDistance'] = min(dists)
         minDis = min(dists)
         index = 0
-        ## handle when oppoent get scared
+        
+        ## 当对方幽灵是害怕状态的时候:
         for i in range(len(dists)):
             if minDis == dists[i]:
                 index = i
+                
         if enemies[index].scaredTimer != 0:
-            # print "scared!"
             features['ghostDistance'] = 0
         else:
-          # returns noise distance to each agents in current state.
-          # print successor.getAgentDistances()
-          # makeObservation
-          #print help(successor.getDistanceProb), exit()
-      # if ghosts around five step, do not try to look for food any more
-          features['distanceToFood'] = 0
+        # 否则观望一下
+        
+        # if ghosts around in five steps, do not try to look for food any more
+        #怎么做呢？首先先别找豆豆了
+          if minDis < 5: #我这么写我也不知道对不对，但是他原本没有这个if
+            features['distanceToFood'] = 0
+          
           # pacman do not want to get into shallow deadend
+          #下面这个if用于判断什么是“死胡同” (这里应该是明面上的判断)
           if len(successor.getLegalActions(self.index)) == 2:
             features['deadend'] = 1
           else:
             features['deadend'] = 0
-          # when pacman have four choices of action. complicate issue
+            
+          # when pacman have four action choices: complicate issue
+          # 这个地方我也不知道有没有逻辑漏洞
           if len(gameState.getLegalActions(self.index)) == 4:
             successorActions = successor.getLegalActions(self.index)
             # successorSec is the sucessor of successor
@@ -225,11 +240,11 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             for numActions in deadEndList:
               if numActions == 2:
                 features['deadend'] += 1
+                
     if action == Directions.STOP: features['stop'] = 1
 
     return features
-
-  
+ 
   def getWeights(self, gameState, action):
       return {'successorScore': 100, 'distanceToFood': -1, 'ghostDistance': 200, 'stop': -300, 'deadend': -200, 'distanceToInv': 50}
 
@@ -261,7 +276,7 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
       dists = [self.getMazeDistance(myPos, a.getPosition()) for a in invaders]
       # for a in invaders:
       #     print "Ghost position", a.getPosition(), "MyPosition: ", myPos
-      # features['invaderDistance'] = min(dists)
+      features['invaderDistance'] = min(dists)
 
     if action == Directions.STOP: features['stop'] = 1
     rev = Directions.REVERSE[gameState.getAgentState(self.index).configuration.direction]
