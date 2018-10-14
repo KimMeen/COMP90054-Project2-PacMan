@@ -4,19 +4,19 @@
 
 ## Team Members
 + Team Name: Pelican
-  + Kangping Xue 878962
-  + Xiang Gao 919108
-  + Ming Jin 947351
+  + **Kangping Xue 878962**
+  + **Xiang Gao 919108**
+  + **Ming Jin 947351**
 ## Youtube Presentation
 This is the presentation video
 ## Theoritical and Experimental Design
-The two approaches used in our agent:
+The two techniques used in our agent:
 + Heuristic Search(A*)
 + Game Theory
 ### Theoritical Design
 + Attacker Agent
   + Using A* to find the optimal path to get foods or capsules
-  + Using A* to find the safest route to escape from their ghosts
+  + Using A* to find the safest route to escape from opponent's ghosts
   + Using Game Theory to determine a dominant stategy between foods and capsules
 + Defender Agent:
   + Using A* to find the best way to catch their Pacman
