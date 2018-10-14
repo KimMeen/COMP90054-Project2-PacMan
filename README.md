@@ -26,6 +26,7 @@ The two techniques used in our agent:
   + Go back home after eating enough foods
   + Go back home after detecting opponent's ghost
   + Help our defender to catch our opponent's ghost if attacker in our domain
+  + Using Game Theory to find the best opportunity to eat the capsule
   + The strategy after eating a capsule(e.g. Super state)
 + Defender Agent:
   + Pratrol around our border
