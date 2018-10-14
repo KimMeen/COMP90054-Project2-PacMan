@@ -24,6 +24,7 @@ The two techniques used in our agent:
 ### Experimental Design
 + Attacker Agent
   + Go back home after eating enough foods
+  ![image](https://github.com/KimMeen/COMP90054-Project2-PacMan/blob/master/1.png)
   + Go back home after detecting opponent's ghost
   + Help our defender to catch our opponent's ghost if attacker in our domain
   + Using Game Theory to find the best opportunity to eat the capsule
