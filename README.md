@@ -24,4 +24,9 @@ This is the presentation video
 | Defensive     | 30*20         | 2                   | 12                |
 | Defensive     | 30*20         | 2                   | -1                |
 ## Challenges
++ How to find the balance between the "safety" and the maximum food carried.
++ How to adjust different stategies to different mpas, i.e. maps without capsules
 ## Future Improvement
++ Deadends detection
++ Using a sophisticate stategy to find another optimal entry to their field when our attacker faces their defender directly in the border
++ 
