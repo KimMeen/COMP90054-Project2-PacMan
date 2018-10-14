@@ -5,10 +5,23 @@
 ## Team Members
 + Team Name: Pelican
 + Team Members:
-  + Kangping Xue 
-  + Xiang Gao 
+  + Kangping Xue 878962
+  + Xiang Gao 919108
   + Ming Jin 947351
 ## Youtube Presentation
+This is the presentation video
 ## Theoritical and Experimental Design
+## Performance in Several Scenarios
+| Agent         | Size of Map   | Number of Capusles  | Experimental Score|
+| ------------- |:-------------:| -------------------:|------------------:|
+| Offensive     | 30*20         | 2                   | 16                |
+| Offensive     | 30*20         | 2                   | 12                |
+| Offensive     | 30*20         | 2                   | -1                |
+
+| Agent         | Size of Map   | Number of Capusles  | Experimental Score|
+| ------------- |:-------------:| -------------------:|------------------:|
+| Defensive     | 30*20         | 2                   | 16                |
+| Defensive     | 30*20         | 2                   | 12                |
+| Defensive     | 30*20         | 2                   | -1                |
 ## Challenges
 ## Future Improvement
