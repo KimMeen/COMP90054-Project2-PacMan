@@ -8,7 +8,7 @@
   + **Xiang Gao 919108**
   + **Ming Jin 947351**
 ## Youtube Presentation
-This is the presentation video
+[A recorded oral presentation](https://youtu.be/W_GWYphGCkE)
 ## Theoritical and Experimental Design
 The two techniques used in our agent:
 + Heuristic Search(A*)
